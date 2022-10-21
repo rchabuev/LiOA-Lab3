@@ -1,0 +1,153 @@
+#include <stdio.h>
+#include <Windows.h>
+
+
+using namespace std;
+
+struct node
+{
+	char inf[256];
+	int priority;
+	node* next = nullptr;
+};
+
+struct node* head = NULL, * last = NULL; // указатели на первый и последний элементы списка
+
+struct node* get_struct(void)
+{
+	struct node* p = NULL;
+	char s[256];
+
+	if ((p = (node*)malloc(sizeof(struct node))) == NULL)  // выделяем память под новый элемент списка
+	{
+		printf("Ошибка при распределении памяти\n");
+		exit(1);
+	}
+
+	printf("Введите название объекта: ");   // вводим данные
+	scanf_s("%s", s, 256);
+	if (*s == 0)
+	{
+		printf("Запись не была произведена\n");
+		return NULL;
+	}
+
+	strcpy_s(p->inf, s);
+	printf("Введите приоритет: ");  
+	scanf_s("%d", &p->priority);
+
+	node* tmp = head;
+	node* left = head;
+
+	while (tmp != nullptr && p->priority < tmp->priority) {
+		left = tmp;
+		tmp = tmp->next;
+	}
+
+	if (tmp != left) {
+		left->next = p;
+	}
+	else head = p;
+
+	p->next = tmp;
+
+	return p;        // возвращаем указатель на созданный элемент
+}
+
+void review(void)
+{
+	struct node* struc = head;
+	if (head == NULL)
+	{
+		printf("Список пуст\n");
+	}
+	while (struc)
+	{
+		printf("Имя - %s, \n", struc->inf);
+		struc = struc->next;
+	}
+	return;
+}
+
+
+/* Функция удаления элемента очереди (первого) */
+void end() {
+	if (head == NULL)
+	{
+		printf("Очередь пуста!\n");
+		exit(1);
+	}
+
+	struct node* tmp = head;  // принять к сведению данные верхнего узла
+	printf("Верхний удаляемый элемент: %s\n", head->inf);
+	head = head->next;  // обновляем верхний указатель, чтобы он указывал на следующий узел
+
+	if (head == NULL) {  // если список стал пустым
+		last = NULL;
+	}
+	free(tmp);
+}
+
+
+/* Функция поиска элемента очереди */
+struct node* find(node* head)
+{
+	struct node* tmp = head;
+	if (head == NULL)
+	{
+		printf("Очередь пуста!\n");
+		return 0;
+	}
+
+	char name[20];
+	printf("Введите название элемента для поиска: ");
+	scanf_s("%s", &name, 20);
+	int i = 0;
+	while (tmp)
+	{
+		i++;
+		if (strcmp(name, tmp->inf) == 0)
+		{
+			printf("Элемент найден - %s\n", tmp->inf);
+			printf("Место в очереди - %d", i);
+			return 0;
+		}
+		tmp = tmp->next;
+	}
+	printf("Элемент не найден(\n");
+	return 0;
+}
+
+
+int main()
+{
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+	printf("Выберите действие:\n");
+	printf("+ - добавить\n");
+	printf("- - удалить\n");
+	printf("f - найти\n");
+	printf("p - вывести на экран\n");
+	Sleep(3000);
+	system("cls");
+	while (true) {
+		int i = getchar();
+		switch (i) {
+		case '+':
+			get_struct();
+			break;
+		case '-':
+			end();
+			break;
+		case 'f':
+			find(head);
+			break;
+		case 'p':
+			review();
+			break;
+		default:
+			break;
+		}
+	}
+	return 0;
+}
